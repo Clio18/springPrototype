@@ -5,8 +5,10 @@ import lombok.Setter;
 import lombok.SneakyThrows;
 
 import javax.annotation.PostConstruct;
+import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,12 +47,25 @@ public class ObjectFactory {
 
         invokeInit(implClass, t);
 
+        //what if we want to show user the log info in the case when for example
+        //RecommedatorImpl became Deprecated? In this case we should use Proxy pattern and
+        //return instead the object of RecommedatorImpl the object of another class which
+        //will implements the same interface
+        if (implClass.isAnnotationPresent(Deprecated.class)) {
+            return (T) Proxy.newProxyInstance(implClass.getClassLoader(), implClass.getInterfaces(), new InvocationHandler() {
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    System.out.println("***** This class is deprecated! *****");
+                    return method.invoke(t);
+                }
+            });
+        }
         return t;
     }
 
     private <T> void invokeInit(Class<T> implClass, T t) throws IllegalAccessException, InvocationTargetException {
         for (Method method : implClass.getMethods()) {
-            if(method.isAnnotationPresent(PostConstruct.class)){
+            if (method.isAnnotationPresent(PostConstruct.class)) {
                 method.invoke(t);
             }
         }

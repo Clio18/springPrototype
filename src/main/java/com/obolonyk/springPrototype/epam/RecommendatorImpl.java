@@ -1,6 +1,7 @@
 package com.obolonyk.springPrototype.epam;
 
 @Singleton
+@Deprecated
 public class RecommendatorImpl implements Recommendator{
 
     @InjectProperty("tea")
