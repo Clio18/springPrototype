@@ -1,7 +1,8 @@
 package com.obolonyk.springPrototype.epam;
 
 public class RecommendatorImpl implements Recommendator{
-    @InjectProperty
+
+    @InjectProperty("tea")
     private String drinks;
 
     @Override
