@@ -1,5 +1,6 @@
 package com.obolonyk.springPrototype.epam;
 
+
 public class RecommendatorImpl implements Recommendator{
 
     @InjectProperty("tea")
