@@ -1,11 +1,14 @@
 package com.obolonyk.springPrototype.epam;
 
 public class CoronaDesinfector {
+    private Announcer announcer = new AnnouncerImpl();
+    private Policeman policeman = new PolicemanImpl();
+
     public void start(Room room){
-        //todo: alarm to go away from room
-        //todo: push everyone from the room
+        announcer.announce("Starting the cleanup!");
+        policeman.makePeopleLeaveRoom();
         desinfect(room);
-        //todo: alarm that desinfection is finished
+        announcer.announce("Finish the cleanup!");
     }
 
     public void desinfect(Room room){
