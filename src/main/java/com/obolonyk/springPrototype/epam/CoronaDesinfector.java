@@ -1,5 +1,6 @@
 package com.obolonyk.springPrototype.epam;
 
+@Deprecated
 public class CoronaDesinfector {
     @InjectByType
     private Announcer announcer;
