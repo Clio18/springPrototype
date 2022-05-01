@@ -25,7 +25,7 @@ public class InjectPropertyAnnotationObjectConfigurator implements ObjectConfigu
 
     @SneakyThrows
     @Override
-    public void configure(Object t) {
+    public void configure(Object t, ApplicationContext context) {
         Class<?> implClass = t.getClass();
         //before we return the object we will made the adjustments
         //to find the annotation injectProperty to insert drinks message to the announcer object
