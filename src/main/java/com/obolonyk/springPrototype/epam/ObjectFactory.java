@@ -21,6 +21,7 @@ public class ObjectFactory {
     //to fill the configurators we should scan the package, find the implementations
     //of the interface and put it to the list
     private List<ObjectConfigurator> configurators = new ArrayList<>();
+    private List<ProxyConfigurator> proxyConfigurators = new ArrayList<>();
 
 
     @SneakyThrows
@@ -30,6 +31,12 @@ public class ObjectFactory {
                 .getScanner()
                 .getSubTypesOf(ObjectConfigurator.class)) {
             configurators.add(configurator.getDeclaredConstructor().newInstance());
+
+        }
+        for (Class<? extends ProxyConfigurator> proxyConfigurator : context.getConfig()
+                .getScanner()
+                .getSubTypesOf(ProxyConfigurator.class)) {
+            proxyConfigurators.add(proxyConfigurator.getDeclaredConstructor().newInstance());
 
         }
     }
@@ -47,18 +54,15 @@ public class ObjectFactory {
 
         invokeInit(implClass, t);
 
-        //what if we want to show user the log info in the case when for example
-        //RecommedatorImpl became Deprecated? In this case we should use Proxy pattern and
-        //return instead the object of RecommedatorImpl the object of another class which
-        //will implements the same interface
-        if (implClass.isAnnotationPresent(Deprecated.class)) {
-            return (T) Proxy.newProxyInstance(implClass.getClassLoader(), implClass.getInterfaces(), new InvocationHandler() {
-                @Override
-                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                    System.out.println("***** This class is deprecated! *****");
-                    return method.invoke(t);
-                }
-            });
+        t = wrapProxyIfNeeded(implClass, t);
+
+
+        return t;
+    }
+
+    private <T> T wrapProxyIfNeeded(Class<T> implClass, T t) {
+        for (ProxyConfigurator proxyConfigurator : proxyConfigurators) {
+            t = (T) proxyConfigurator.replaceWithProxyIfNeeded(t, implClass);
         }
         return t;
     }
